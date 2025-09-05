@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Видео</title>
+<style>
+  :root {
+    --x: 265px;
+    --y: 350px;
+    --w: 820px;
+    --h: 440px;
+  }
+  * { box-sizing: border-box; }
+  html,body { height:100%; margin:0; }
+  body {
+    background:#000;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stage {
+    position:relative;
+    width:min(1100px, 96vw);
+    aspect-ratio: 1100 / 700; /* приблизительное соотношение твоего макета */
+    background: url('slice_06.png') center / cover no-repeat;
+    border-radius: 18px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  /* Площадка под видео — точно в рамке */
+  .video-slot, video {
+    position:absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
+    border-radius: 12px;
+    background:#000;
+  }
+  /* Само видео сначала скрыто, без контролов */
+  video {
+    display:none;
+    object-fit: cover;
+  }
+  /* Невидимая зона клика (совпадает с рамкой) */
+  .hotspot {
+    position:absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
+    cursor:pointer;
+  }
+
+  /* Адаптив: при сужении уменьшаем всё пропорционально контейнеру */
+  .stage { font-size: 1px; }
+  .stage > * { transform-origin: top left; }
+  .stage.rescale > * { transform: scale(var(--scale)); }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="video-slot"></div>
+    <div class="hotspot" id="hotspot" aria-label="play"></div>
+    <video id="vid" playsinline disablePictureInPicture controlslist="nodownload noplaybackrate noremoteplayback">
+      <source src="video_03.mp4" type="video/mp4">
+    </video>
+  </div>
+
+<script>
+  // Масштабирование макета под ширину
+  const stage = document.getElementById('stage');
+  const baseW = 1100, baseH = 700;
+  function fit() {
+    const w = stage.clientWidth;
+    const s = w / baseW;
+    stage.style.setProperty('--scale', s);
+    stage.classList.add('rescale');
+    stage.style.height = (baseH * s) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  // Клик по зоне — показать видео и запустить
+  const hotspot = document.getElementById('hotspot');
+  const vid = document.getElementById('vid');
+  hotspot.addEventListener('click', () => {
+    vid.style.display = 'block';
+    vid.play().catch(() => {
+      // если браузер блокирует автостарт — показываем и ждём второго клика
+    });
+  });
+</script>
+</body>
+</html>
